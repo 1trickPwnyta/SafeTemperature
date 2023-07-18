@@ -9,6 +9,10 @@
 	<description>
 Improves the safe temperature mechanic by forcing pawns to immediately drop what they're doing upon reaching serious temperature to go wait in a safe temperature area. Also forces them to stay in the safe temperature area until they are no longer shivering/initial heatstroke.
 
+=== Updates ===
+07/18/2023: Allows pawns to perform work in safe temperature zones.
+07/14/2023: Allows player control while pawn is drafted.
+
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 If you enjoy my work and want to support me and my family, I take donations at:
 https://ko-fi.com/1trickpwnyta

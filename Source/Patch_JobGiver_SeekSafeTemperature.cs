@@ -11,12 +11,15 @@ namespace SafeTemperature
     {
         public static void Postfix(Pawn pawn, ref Job __result)
         {
+            FloatRange tempRange = pawn.ComfortableTemperatureRange();
             if (pawn.health.hediffSet.HasTemperatureInjury(TemperatureInjuryStage.Initial))
             {
-                FloatRange tempRange = pawn.ComfortableTemperatureRange();
-                if (tempRange.Includes(pawn.AmbientTemperature))
+                if (!pawn.CurJob.GetTarget(TargetIndex.A).IsValid || !tempRange.Includes(pawn.CurJob.GetTarget(TargetIndex.A).Cell.GetTemperature(pawn.Map)))
                 {
-                    __result = JobMaker.MakeJob(JobDefOf.Wait_SafeTemperature, 500, true);
+                    if (tempRange.Includes(pawn.AmbientTemperature))
+                    {
+                        __result = JobMaker.MakeJob(JobDefOf.Wait_SafeTemperature, 500, true);
+                    }
                 }
             }
         }

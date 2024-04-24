@@ -12,55 +12,48 @@ namespace SafeTemperature
     {
         public static void Postfix(Pawn pawn, ref Job __result)
         {
-            // Make sure pawn has at least initial temperature injury before making any calculations
-            if (pawn.health.hediffSet.HasTemperatureInjury(TemperatureInjuryStage.Initial)) 
+            if (__result == null) 
             {
-                FloatRange tempRange = pawn.ComfortableTemperatureRange();
-
-                // Find the safest region for the pawn, starting with the closest safe region
-                Region safestRegion;
-                safestRegion = JobGiver_SeekSafeTemperature.ClosestRegionWithinTemperatureRange(pawn.Position, pawn.MapHeld, pawn, tempRange, TraverseParms.For(pawn));
-
-                // If no safe region exists, find the best region based on whether the pawn is too cold or too hot
-                if (safestRegion == null)
+                // Make sure pawn has at least initial temperature injury before making any calculations
+                if (pawn.health.hediffSet.HasTemperatureInjury(TemperatureInjuryStage.Initial) && !pawn.InMentalState)
                 {
-                    Hediff hypothermia = pawn.health.hediffSet.GetFirstHediffOfDef(HediffDefOf.Hypothermia);
-                    Hediff heatstroke = pawn.health.hediffSet.GetFirstHediffOfDef(HediffDefOf.Heatstroke);
+                    FloatRange tempRange = pawn.ComfortableTemperatureRange();
 
-                    if (hypothermia != null && (heatstroke == null || hypothermia.Severity > heatstroke.Severity))
+                    // Find the safest region for the pawn, starting with the closest safe region
+                    Region safestRegion;
+                    safestRegion = JobGiver_SeekSafeTemperature.ClosestRegionWithinTemperatureRange(pawn.Position, pawn.MapHeld, pawn, tempRange, TraverseParms.For(pawn));
+
+                    // If no safe region exists, find the best region based on whether the pawn is too cold or too hot
+                    if (safestRegion == null)
                     {
-                        // Look for the coldest region warmer than comfortable range
-                        safestRegion = TemperatureUtility.ColdestRegionWarmerThanTemperatureRange(pawn.Position, pawn.MapHeld, pawn, tempRange, TraverseParms.For(pawn));
-                        // If no region exists, look for the warmest region
-                        if (safestRegion == null)
+                        Hediff hypothermia = pawn.health.hediffSet.GetFirstHediffOfDef(HediffDefOf.Hypothermia);
+                        Hediff heatstroke = pawn.health.hediffSet.GetFirstHediffOfDef(HediffDefOf.Heatstroke);
+
+                        if (hypothermia != null && (heatstroke == null || hypothermia.Severity > heatstroke.Severity))
                         {
-                            FloatRange max = new FloatRange(float.MaxValue);
-                            safestRegion = TemperatureUtility.WarmestRegionColderThanTemperatureRange(pawn.Position, pawn.MapHeld, pawn, max, TraverseParms.For(pawn));
+                            // Look for the coldest region warmer than comfortable range
+                            safestRegion = TemperatureUtility.ColdestRegionWarmerThanTemperatureRange(pawn.Position, pawn.MapHeld, pawn, tempRange, TraverseParms.For(pawn));
+                            // If no region exists, look for the warmest region
+                            if (safestRegion == null)
+                            {
+                                FloatRange max = new FloatRange(float.MaxValue);
+                                safestRegion = TemperatureUtility.WarmestRegionColderThanTemperatureRange(pawn.Position, pawn.MapHeld, pawn, max, TraverseParms.For(pawn));
+                            }
+                        }
+                        if (heatstroke != null && (hypothermia == null || heatstroke.Severity > hypothermia.Severity))
+                        {
+                            // Look for the warmest region colder than comfortable range
+                            safestRegion = TemperatureUtility.WarmestRegionColderThanTemperatureRange(pawn.Position, pawn.MapHeld, pawn, tempRange, TraverseParms.For(pawn));
+                            // If no region exists, look for the coldest region
+                            if (safestRegion == null)
+                            {
+                                FloatRange min = new FloatRange(float.MinValue);
+                                safestRegion = TemperatureUtility.ColdestRegionWarmerThanTemperatureRange(pawn.Position, pawn.MapHeld, pawn, min, TraverseParms.For(pawn));
+                            }
                         }
                     }
-                    if (heatstroke != null && (hypothermia == null || heatstroke.Severity > hypothermia.Severity))
-                    {
-                        // Look for the warmest region colder than comfortable range
-                        safestRegion = TemperatureUtility.WarmestRegionColderThanTemperatureRange(pawn.Position, pawn.MapHeld, pawn, tempRange, TraverseParms.For(pawn));
-                        // If no region exists, look for the coldest region
-                        if (safestRegion == null)
-                        {
-                            FloatRange min = new FloatRange(float.MinValue);
-                            safestRegion = TemperatureUtility.ColdestRegionWarmerThanTemperatureRange(pawn.Position, pawn.MapHeld, pawn, min, TraverseParms.For(pawn));
-                        }
-                    }
-                }
 
-                if (safestRegion == null)
-                {
-                    Debug.Log("Couldn't find the safest region for: " + pawn.Name);
-                }
-
-                // Check if current job is taking the pawn to the safest temperature already
-                if (pawn.CurJob == null || pawn.CurJob.GetTarget(TargetIndex.A) == null || !pawn.CurJob.GetTarget(TargetIndex.A).IsValid || pawn.CurJob.GetTarget(TargetIndex.A).Cell.GetTemperature(pawn.Map) != safestRegion.Room.Temperature)
-                {
-                    // Check if a safe temperature job has already been issued
-                    if (__result == null)
+                    if (safestRegion != null)
                     {
                         if (safestRegion.Cells.ToList().Contains(pawn.Position))
                         {
@@ -80,11 +73,6 @@ namespace SafeTemperature
                             }
                         }
                     }
-                }
-                else
-                {
-                    // If current job leads to safest region, cancel issuing any new job
-                    __result = null;
                 }
             }
         }

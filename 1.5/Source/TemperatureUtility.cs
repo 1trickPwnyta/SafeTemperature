@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using RimWorld;
+using System.Collections.Generic;
 using System.Linq;
 using Verse;
 using Verse.AI;
@@ -7,6 +8,36 @@ namespace SafeTemperature
 {
     public static class TemperatureUtility
     {
+        public static bool HasMinTemperatureInjury(this Pawn pawn)
+        {
+            Hediff hypothermia = pawn.health.hediffSet.GetFirstHediffOfDef(HediffDefOf.Hypothermia);
+            if (hypothermia != null && hypothermia.Severity >= SafeTemperatureSettings.HypothermiaSeverityRange.min)
+            {
+                return true;
+            }
+            Hediff heatstroke = pawn.health.hediffSet.GetFirstHediffOfDef(HediffDefOf.Heatstroke);
+            if (heatstroke != null && heatstroke.Severity >= SafeTemperatureSettings.HeatstrokeSeverityRange.min)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public static bool HasMaxTemperatureInjury(this Pawn pawn)
+        {
+            Hediff hypothermia = pawn.health.hediffSet.GetFirstHediffOfDef(HediffDefOf.Hypothermia);
+            if (hypothermia != null && hypothermia.Severity >= SafeTemperatureSettings.HypothermiaSeverityRange.max)
+            {
+                return true;
+            }
+            Hediff heatstroke = pawn.health.hediffSet.GetFirstHediffOfDef(HediffDefOf.Heatstroke);
+            if (heatstroke != null && heatstroke.Severity >= SafeTemperatureSettings.HeatstrokeSeverityRange.max)
+            {
+                return true;
+            }
+            return false;
+        }
+
         public static Region ColdestRegionWarmerThanTemperatureRange(IntVec3 root, Map map, Pawn pawn, FloatRange tempRange, TraverseParms traverseParms)
         {
             Region rootRegion = root.GetRegion(map);

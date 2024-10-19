@@ -8,13 +8,17 @@
 		<li>1.5</li>
 	</supportedVersions>
 	<description>
-Improves the safe temperature mechanic by forcing pawns to immediately drop what they're doing upon reaching serious temperature to go wait in a safe temperature area. Also forces them to stay in the safe temperature area until they are no longer shivering/initial heatstroke.
+Improves the safe temperature mechanic by forcing pawns to immediately drop what they're doing upon reaching serious temperature to go wait in a safe temperature area. Also forces them to stay in the safe temperature area until they are no longer shivering/initial heatstroke. Includes options to tweak these behaviors.
 
 === Updates ===
+10/18/2024: Add settings for various pawn behaviors
 04/29/2024: Update to 1.5, fix errors/warnings in log, prevent pawns from waiting in doorways, and allow pawns to use smarter, less all-or-nothing logic when selecting an area to seek temperature safety
 08/24/2023: Restricts safe temperature behavior to colonists only
 07/18/2023: Allows pawns to perform work in safe temperature zones, allows player to manually assign jobs inside or outside of safe temperature zones.
 07/14/2023: Allows player control while pawn is drafted.
+
+=== Credits ===
+Mod icon: twitter.com/mouse_draws
 	</description>
 	<url>https://github.com/1trickPwnyta/SafeTemperature</url>
 	<modDependencies>

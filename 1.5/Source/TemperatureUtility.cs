@@ -38,7 +38,7 @@ namespace SafeTemperature
             return false;
         }
 
-        public static Region ColdestRegionWarmerThanTemperatureRange(IntVec3 root, Map map, Pawn pawn, FloatRange tempRange, TraverseParms traverseParms)
+        public static Region ClosestRegionToTemperatureRange(IntVec3 root, Map map, Pawn pawn, FloatRange tempRange, TraverseParms traverseParms, bool above)
         {
             Region rootRegion = root.GetRegion(map);
             if (rootRegion == null)
@@ -46,50 +46,36 @@ namespace SafeTemperature
                 return null;
             }
 
-            IEnumerable<Region> validRegions = map.regionGrid.AllRegions.Where(r => IsValidRegionForPawn(r, pawn));
+            IEnumerable<Region> consideredRegions = RegionsToConsider(rootRegion, traverseParms, map, pawn);
 
             float coldestTemp = float.MaxValue;
-            foreach (Region region in validRegions)
-            {
-                if (region.Room.Temperature < coldestTemp && region.Room.Temperature > tempRange.max)
-                {
-                    coldestTemp = region.Room.Temperature;
-                }
-            }
-
-            if (!validRegions.Any(r => r.Room.Temperature != coldestTemp))
-            {
-                return null;
-            }
-
-            return ClosestRegionInTemperature(rootRegion, coldestTemp, traverseParms, pawn);
-        }
-
-        public static Region WarmestRegionColderThanTemperatureRange(IntVec3 root, Map map, Pawn pawn, FloatRange tempRange, TraverseParms traverseParms)
-        {
-            Region rootRegion = root.GetRegion(map);
-            if (rootRegion == null)
-            {
-                return null;
-            }
-
-            IEnumerable<Region> validRegions = map.regionGrid.AllRegions.Where(r => IsValidRegionForPawn(r, pawn));
-
             float warmestTemp = float.MinValue;
-            foreach (Region region in validRegions)
+            float? lastTemp = null;
+            bool differentTemps = false;
+            foreach (Region region in consideredRegions)
             {
-                if (region.Room.Temperature > warmestTemp && region.Room.Temperature < tempRange.min)
+                float temp = region.Room.Temperature;
+                if (lastTemp != null && temp != lastTemp)
                 {
-                    warmestTemp = region.Room.Temperature;
+                    differentTemps = true;
+                }
+                lastTemp = temp;
+                if (above && temp < coldestTemp && temp > tempRange.max)
+                {
+                    coldestTemp = temp;
+                }
+                if (!above && temp > warmestTemp && temp < tempRange.min)
+                {
+                    warmestTemp = temp;
                 }
             }
 
-            if (!validRegions.Any(r => r.Room.Temperature != warmestTemp))
+            if (!differentTemps)
             {
                 return null;
             }
-
-            return ClosestRegionInTemperature(rootRegion, warmestTemp, traverseParms, pawn);
+            
+            return ClosestRegionInTemperature(rootRegion, consideredRegions.ToList(), above ? coldestTemp : warmestTemp, traverseParms, pawn);
         }
 
         private static bool IsValidRegionForPawn(Region region, Pawn pawn)
@@ -97,13 +83,36 @@ namespace SafeTemperature
             return !region.IsDoorway && RimWorld.JobGiver_SeekSafeTemperature.TryGetAllowedCellInRegion(region, pawn, out IntVec3 intVec) && pawn.CanReach(new LocalTargetInfo(intVec), PathEndMode.OnCell, Danger.Deadly);
         }
 
-        private static Region ClosestRegionInTemperature(Region rootRegion, float temperature, TraverseParms traverseParms, Pawn pawn)
+        private static IEnumerable<Region> RegionsToConsider(Region rootRegion, TraverseParms traverseParms, Map map, Pawn pawn)
+        {
+            Region closestOutdoorRegion = ClosestOutdoorRegion(rootRegion, traverseParms, pawn);
+            return map.regionGrid.AllRegions.Where(r => (!r.Room.UsesOutdoorTemperature || r == closestOutdoorRegion) && IsValidRegionForPawn(r, pawn));
+        }
+
+        private static Region ClosestRegionInTemperature(Region rootRegion, List<Region> acceptableRegions, float temperature, TraverseParms traverseParms, Pawn pawn)
         {
             RegionEntryPredicate entryCondition = (Region from, Region r) => r.Allows(traverseParms, false);
             Region foundReg = null;
             RegionProcessor regionProcessor = delegate (Region r)
             {
-                if (IsValidRegionForPawn(r, pawn) && r.Room.Temperature == temperature)
+                if (acceptableRegions.Contains(r) && r.Room.Temperature == temperature)
+                {
+                    foundReg = r;
+                    return true;
+                }
+                return false;
+            };
+            RegionTraverser.BreadthFirstTraverse(rootRegion, entryCondition, regionProcessor);
+            return foundReg;
+        }
+
+        private static Region ClosestOutdoorRegion(Region rootRegion, TraverseParms traverseParms, Pawn pawn)
+        {
+            RegionEntryPredicate entryCondition = (Region from, Region r) => r.Allows(traverseParms, false);
+            Region foundReg = null;
+            RegionProcessor regionProcessor = delegate (Region r)
+            {
+                if (IsValidRegionForPawn(r, pawn) && r.Room.UsesOutdoorTemperature)
                 {
                     foundReg = r;
                     return true;

@@ -30,23 +30,23 @@ namespace SafeTemperature
                     if (hypothermia != null && (heatstroke == null || hypothermia.Severity > heatstroke.Severity))
                     {
                         // Look for the coldest region warmer than comfortable range
-                        safestRegion = TemperatureUtility.ColdestRegionWarmerThanTemperatureRange(pawn.Position, pawn.MapHeld, pawn, tempRange, TraverseParms.For(pawn));
+                        safestRegion = TemperatureUtility.ClosestRegionToTemperatureRange(pawn.Position, pawn.MapHeld, pawn, tempRange, TraverseParms.For(pawn), true);
                         // If no region exists, look for the warmest region
                         if (safestRegion == null)
                         {
                             FloatRange max = new FloatRange(float.MaxValue);
-                            safestRegion = TemperatureUtility.WarmestRegionColderThanTemperatureRange(pawn.Position, pawn.MapHeld, pawn, max, TraverseParms.For(pawn));
+                            safestRegion = TemperatureUtility.ClosestRegionToTemperatureRange(pawn.Position, pawn.MapHeld, pawn, max, TraverseParms.For(pawn), false);
                         }
                     }
                     if (heatstroke != null && (hypothermia == null || heatstroke.Severity > hypothermia.Severity))
                     {
                         // Look for the warmest region colder than comfortable range
-                        safestRegion = TemperatureUtility.WarmestRegionColderThanTemperatureRange(pawn.Position, pawn.MapHeld, pawn, tempRange, TraverseParms.For(pawn));
+                        safestRegion = TemperatureUtility.ClosestRegionToTemperatureRange(pawn.Position, pawn.MapHeld, pawn, tempRange, TraverseParms.For(pawn), false);
                         // If no region exists, look for the coldest region
                         if (safestRegion == null)
                         {
                             FloatRange min = new FloatRange(float.MinValue);
-                            safestRegion = TemperatureUtility.ColdestRegionWarmerThanTemperatureRange(pawn.Position, pawn.MapHeld, pawn, min, TraverseParms.For(pawn));
+                            safestRegion = TemperatureUtility.ClosestRegionToTemperatureRange(pawn.Position, pawn.MapHeld, pawn, min, TraverseParms.For(pawn), true);
                         }
                     }
                 }

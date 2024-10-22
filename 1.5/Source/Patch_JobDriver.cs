@@ -11,7 +11,7 @@ namespace SafeTemperature
     {
         public static void Postfix(Pawn ___pawn)
         {
-            if (SafeTemperatureSettings.SeekSafeTemperatureIntervalEnabled && Find.TickManager.TicksGame % SafeTemperatureSettings.SeekSafeTemperatureIntervalTicks == 0 && ___pawn.IsFreeColonist && !___pawn.Downed && !___pawn.Drafted && !___pawn.CurJob.playerForced && ___pawn.jobs.curJob.def != DefDatabase<JobDef>.GetNamed("GotoSafeTemperature") && ___pawn.jobs.curJob.def != DefDatabase<JobDef>.GetNamed("Wait_SafeTemperature"))
+            if (SafeTemperatureSettings.SeekSafeTemperatureIntervalEnabled && ___pawn.IsHashIntervalTick(SafeTemperatureSettings.SeekSafeTemperatureIntervalTicks) && ___pawn.IsFreeColonist && !___pawn.Downed && !___pawn.Drafted && !___pawn.CurJob.playerForced && ___pawn.jobs.curJob.def != DefDatabase<JobDef>.GetNamed("GotoSafeTemperature") && ___pawn.jobs.curJob.def != DefDatabase<JobDef>.GetNamed("Wait_SafeTemperature"))
             {
                 ThinkResult thinkResult = new JobGiver_SeekSafeTemperature().TryIssueJobPackage(___pawn, new JobIssueParams());
                 if (thinkResult.Job != null)

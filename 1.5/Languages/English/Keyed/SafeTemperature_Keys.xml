@@ -6,6 +6,10 @@
 	<SafeTemperature_SeekSafeTemperatureIntervalTicksDesc>Pawns will interrupt their work to seek safe temperature, if needed, after this many ticks.</SafeTemperature_SeekSafeTemperatureIntervalTicksDesc>
 	<SafeTemperature_UseSuboptimalTemperatureRegions>Use suboptimal temperature regions</SafeTemperature_UseSuboptimalTemperatureRegions>
 	<SafeTemperature_UseSuboptimalTemperatureRegionsDesc>Enable to consider areas with less-than-ideal temperature in case no area is found within a pawn's comfortable temperature range. This means pawns will seek the safest area possible even when no area is totally safe.</SafeTemperature_UseSuboptimalTemperatureRegionsDesc>
+	<SafeTemperature_AllowUndercorrecting>Allow undercorrecting</SafeTemperature_AllowUndercorrecting>
+	<SafeTemperature_AllowUndercorrectingDesc>Enable to consider areas that will only slow down temperature injury when nothing else is available.</SafeTemperature_AllowUndercorrectingDesc>
+	<SafeTemperature_RegionCachingExpiryTicks>Region caching expiry ticks: {0}</SafeTemperature_RegionCachingExpiryTicks>
+	<SafeTemperature_RegionCachingExpiryTicksDesc>Ticks after which suboptimal temperature regions must be recalculated.</SafeTemperature_RegionCachingExpiryTicksDesc>
 	<SafeTemperature_HypothermiaSeverityRange>Hypothermia target range: {0}</SafeTemperature_HypothermiaSeverityRange>
 	<SafeTemperature_HypothermiaSeverityRangeDesc>The hypothermia severity range that pawns will try to stay in. When at the maximum of the range, pawns will seek warmth and wait there until they reach the minimum of the range.</SafeTemperature_HypothermiaSeverityRangeDesc>
 	<SafeTemperature_HeatstrokeSeverityRange>Heatstroke target range: {0}</SafeTemperature_HeatstrokeSeverityRange>

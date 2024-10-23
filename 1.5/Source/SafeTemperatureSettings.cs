@@ -11,6 +11,8 @@ namespace SafeTemperature
         public static bool SeekSafeTemperatureIntervalEnabled = true;
         public static int SeekSafeTemperatureIntervalTicks = 60;
         public static bool UseSuboptimalTemperatureRegions = true;
+        public static bool AllowUndercorrecting = true;
+        public static int RegionCachingExpiryTicks = 300;
         public static FloatRange HypothermiaSeverityRange = new FloatRange(0.04f, 0.35f);
         public static FloatRange HeatstrokeSeverityRange = new FloatRange(0.04f, 0.35f);
 
@@ -22,11 +24,14 @@ namespace SafeTemperature
             listingStandard.CheckboxLabeled("SafeTemperature_SeekSafeTemperatureIntervalEnabled".Translate(), ref SeekSafeTemperatureIntervalEnabled, "SafeTemperature_SeekSafeTemperatureIntervalEnabledDesc".Translate());
             if (SeekSafeTemperatureIntervalEnabled)
             {
-                listingStandard.Indent();
-                SeekSafeTemperatureIntervalTicks = (int)listingStandard.SliderLabeled("SafeTemperature_SeekSafeTemperatureIntervalTicks".Translate(SeekSafeTemperatureIntervalTicks), SeekSafeTemperatureIntervalTicks, 1, 600, 0.5f, "SafeTemperature_SeekSafeTemperatureIntervalTicksDesc".Translate());
-                listingStandard.Outdent();
+                SeekSafeTemperatureIntervalTicks = (int)listingStandard.SliderLabeled("    " + "SafeTemperature_SeekSafeTemperatureIntervalTicks".Translate(SeekSafeTemperatureIntervalTicks), SeekSafeTemperatureIntervalTicks, 1, 600, 0.5f, "SafeTemperature_SeekSafeTemperatureIntervalTicksDesc".Translate());
             }
             listingStandard.CheckboxLabeled("SafeTemperature_UseSuboptimalTemperatureRegions".Translate(), ref UseSuboptimalTemperatureRegions, "SafeTemperature_UseSuboptimalTemperatureRegionsDesc".Translate());
+            if (UseSuboptimalTemperatureRegions)
+            {
+                listingStandard.CheckboxLabeled("    " + "SafeTemperature_AllowUndercorrecting".Translate(), ref AllowUndercorrecting, "SafeTemperature_AllowUndercorrectingDesc".Translate());
+                RegionCachingExpiryTicks = (int)listingStandard.SliderLabeled("    " + "SafeTemperature_RegionCachingExpiryTicks".Translate(RegionCachingExpiryTicks), RegionCachingExpiryTicks, 1, 1000, 0.5f, "SafeTemperature_RegionCachingExpiryTicksDesc".Translate());
+            }
             listingStandard.End();
 
             float y = listingStandard.CurHeight;
@@ -75,6 +80,8 @@ namespace SafeTemperature
             Scribe_Values.Look(ref SeekSafeTemperatureIntervalEnabled, "SeekSafeTemperatureIntervalEnabled", true);
             Scribe_Values.Look(ref SeekSafeTemperatureIntervalTicks, "SeekSafeTemperatureIntervalTicks", 60);
             Scribe_Values.Look(ref UseSuboptimalTemperatureRegions, "UseSuboptimalTemperatureRegions", true);
+            Scribe_Values.Look(ref AllowUndercorrecting, "AllowUndercorrecting", true);
+            Scribe_Values.Look(ref RegionCachingExpiryTicks, "RegionCachingExpiryTicks", 300);
             Scribe_Values.Look(ref HypothermiaSeverityRange, "HypothermiaSeverityRange", new FloatRange(0.04f, 0.35f));
             Scribe_Values.Look(ref HypothermiaSeverityRange, "HeatstrokeSeverityRange", new FloatRange(0.04f, 0.35f));
         }

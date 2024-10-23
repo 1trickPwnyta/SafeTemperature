@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Verse;
 using Verse.AI;
+using Verse.Noise;
 
 namespace SafeTemperature
 {
@@ -80,7 +81,7 @@ namespace SafeTemperature
 
         public static bool IsValidRegionForPawn(Region region, Pawn pawn)
         {
-            return !region.IsDoorway && RimWorld.JobGiver_SeekSafeTemperature.TryGetAllowedCellInRegion(region, pawn, out IntVec3 intVec) && pawn.CanReach(new LocalTargetInfo(intVec), PathEndMode.OnCell, Danger.Deadly);
+            return !region.IsDoorway && JobGiver_SeekSafeTemperature.TryGetAllowedCellInRegion(region, pawn, out IntVec3 intVec) && pawn.CanReach(new LocalTargetInfo(intVec), PathEndMode.OnCell, Danger.Deadly);
         }
 
         private static IEnumerable<Region> RegionsToConsider(Region rootRegion, TraverseParms traverseParms, Map map, Pawn pawn)
@@ -121,6 +122,16 @@ namespace SafeTemperature
             };
             RegionTraverser.BreadthFirstTraverse(rootRegion, entryCondition, regionProcessor);
             return foundReg;
+        }
+
+        public static Region ClosestOutdoorRegionToPawn(Pawn pawn)
+        {
+            Region rootRegion = pawn.Position.GetRegion(pawn.MapHeld);
+            if (rootRegion == null)
+            {
+                return null;
+            }
+            return ClosestOutdoorRegion(rootRegion, TraverseParms.For(pawn), pawn);
         }
     }
 }

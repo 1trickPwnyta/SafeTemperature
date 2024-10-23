@@ -78,7 +78,7 @@ namespace SafeTemperature
             return ClosestRegionInTemperature(rootRegion, consideredRegions.ToList(), above ? coldestTemp : warmestTemp, traverseParms, pawn);
         }
 
-        private static bool IsValidRegionForPawn(Region region, Pawn pawn)
+        public static bool IsValidRegionForPawn(Region region, Pawn pawn)
         {
             return !region.IsDoorway && RimWorld.JobGiver_SeekSafeTemperature.TryGetAllowedCellInRegion(region, pawn, out IntVec3 intVec) && pawn.CanReach(new LocalTargetInfo(intVec), PathEndMode.OnCell, Danger.Deadly);
         }
